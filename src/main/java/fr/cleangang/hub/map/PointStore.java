@@ -36,7 +36,7 @@ public final class PointStore {
                     Items.material(s.getString("icon"), Material.ENDER_PEARL),
                     s.getInt("slot", -1),
                     s.getStringList("lore"),
-                    s.getString("world", "world"),
+                    s.getString("world", "minecraft:overworld"),
                     s.getDouble("x"), s.getDouble("y"), s.getDouble("z"),
                     (float) s.getDouble("yaw"), (float) s.getDouble("pitch")));
         }

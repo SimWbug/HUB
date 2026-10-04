@@ -3,6 +3,7 @@ package fr.cleangang.hub.command;
 import fr.cleangang.hub.CleanGangHub;
 import fr.cleangang.hub.map.WarpPoint;
 import fr.cleangang.hub.util.Items;
+import fr.cleangang.hub.util.Text;
 import fr.cleangang.hub.world.WorldManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -49,41 +50,53 @@ public final class HubCommand implements TabExecutor {
         switch (sub) {
             case "list" -> {
                 plugin.msg(s, "<gold>Mondes :");
-                for (String n : wm.knownWorlds()) {
-                    World w = Bukkit.getWorld(n);
-                    s.sendMessage(fr.cleangang.hub.util.Text.mm(w != null
-                            ? " <green>● <white>" + n + " <gray>(" + w.getPlayers().size() + " joueurs)"
-                            : " <red>○ <gray>" + n + " (non chargé)"));
+                for (String ref : wm.knownWorlds()) {
+                    World w = wm.resolve(ref);
+                    s.sendMessage(Text.mm(w != null
+                            ? " <green>● <white>" + ref + " <dark_gray>(" + w.getKey().asString() + ") <gray>"
+                                + w.getPlayers().size() + " joueur(s)"
+                            : " <red>○ <gray>" + ref + " <dark_gray>(non chargé)"));
                 }
             }
             case "create", "load" -> {
-                if (a.length < 3) { plugin.msg(s, "<red>/cghub world " + sub + " <nom> [" + String.join("|", WorldManager.TYPES) + "]"); return; }
-                String name = a[2];
-                String type = a.length > 3 ? a[3] : (sub.equals("create") ? "void" : "normal");
-                if (Bukkit.getWorld(name) != null) { plugin.msg(s, "<yellow>Ce monde est déjà chargé."); return; }
-                if (sub.equals("load") && !wm.existsOnDisk(name)) {
-                    plugin.msg(s, "<red>Dossier '" + name + "' introuvable. Copie la map dans le dossier du serveur.");
+                if (a.length < 3) {
+                    plugin.msg(s, "<red>/cghub world " + sub + " <id> [" + String.join("|", WorldManager.TYPES) + "]");
                     return;
                 }
-                plugin.msg(s, "<gray>Chargement de <white>" + name + "<gray>…");
-                World w = wm.create(name, type);
-                plugin.msg(s, w != null ? "<green>Monde <white>" + name + "<green> prêt." : "<red>Échec du chargement.");
+                String id = a[2].toLowerCase(Locale.ROOT);
+                if (!WorldManager.isValidId(id)) {
+                    plugin.msg(s, "<red>Id invalide : minuscules, chiffres, _ - . uniquement.");
+                    return;
+                }
+                String type = a.length > 3 ? a[3] : plugin.getConfig().getString("worlds." + id + ".type",
+                        sub.equals("create") ? "void" : "normal");
+                if (wm.resolve(id) != null) { plugin.msg(s, "<yellow>Ce monde est déjà chargé."); return; }
+                if (sub.equals("load") && !wm.existsOnDisk(id)) {
+                    plugin.msg(s, "<red>Rien trouvé pour '" + id + "'. Attendu : " + wm.keyFor(id).asString()
+                            + " dans world/dimensions/, ou un dossier '" + id + "' (avec level.dat) à la racine.");
+                    return;
+                }
+                plugin.msg(s, "<gray>Chargement de <white>" + id + "<gray>…");
+                World w = sub.equals("create") ? wm.create(id, type) : wm.load(id, type, false);
+                plugin.msg(s, w != null
+                        ? "<green>Monde <white>" + id + "<green> prêt <dark_gray>(" + w.getKey().asString() + ")"
+                        : "<red>Échec du chargement (voir la console).");
             }
             case "unload" -> {
-                if (a.length < 3) { plugin.msg(s, "<red>/cghub world unload <nom>"); return; }
+                if (a.length < 3) { plugin.msg(s, "<red>/cghub world unload <id>"); return; }
                 plugin.msg(s, wm.unload(a[2]) ? "<green>Monde déchargé." : "<red>Impossible (introuvable ou monde hub).");
             }
             case "tp" -> {
-                if (a.length < 3) { plugin.msg(s, "<red>/cghub world tp <nom> [joueur]"); return; }
-                World w = Bukkit.getWorld(a[2]);
+                if (a.length < 3) { plugin.msg(s, "<red>/cghub world tp <id> [joueur]"); return; }
+                World w = wm.resolve(a[2]);
                 Player target = a.length > 3 ? Bukkit.getPlayerExact(a[3]) : (s instanceof Player p ? p : null);
                 if (w == null || target == null) { plugin.msg(s, "<red>Monde ou joueur introuvable."); return; }
-                plugin.teleporter().teleport(target, w.getSpawnLocation().add(0.5, 0, 0.5), "<white>" + w.getName());
+                plugin.teleporter().teleport(target, w.getSpawnLocation().add(0.5, 0, 0.5), "<white>" + wm.label(w));
             }
             case "setspawn" -> {
                 if (!(s instanceof Player p)) return;
                 p.getWorld().setSpawnLocation(p.getLocation());
-                plugin.msg(s, "<green>Spawn de <white>" + p.getWorld().getName() + "<green> défini ici.");
+                plugin.msg(s, "<green>Spawn de <white>" + wm.label(p.getWorld()) + "<green> défini ici.");
             }
             default -> help(s);
         }
@@ -96,8 +109,8 @@ public final class HubCommand implements TabExecutor {
             case "list" -> {
                 plugin.msg(s, "<gold>Points de la carte :");
                 for (WarpPoint p : plugin.points().all()) {
-                    s.sendMessage(fr.cleangang.hub.util.Text.mm(" <yellow>" + p.id() + " <gray>case " + p.slot()
-                            + " → " + p.world() + " " + (int) p.x() + " " + (int) p.y() + " " + (int) p.z()));
+                    s.sendMessage(Text.mm(" <yellow>" + p.id() + " <gray>case " + p.slot()
+                            + " → " + p.world() + (p.available() ? "" : " <red>(non chargé)<gray>") + " " + (int) p.x() + " " + (int) p.y() + " " + (int) p.z()));
                 }
             }
             case "set" -> {
@@ -140,11 +153,11 @@ public final class HubCommand implements TabExecutor {
     private void help(CommandSender s) {
         plugin.msg(s, "<gold>Commandes :");
         for (String l : List.of(
-                "/cghub world list | create <nom> [type] | load <nom> [type] | unload <nom> | tp <nom> [joueur] | setspawn",
+                "/cghub world list | create <id> [type] | load <id> [type] | unload <id> | tp <id> [joueur] | setspawn",
                 "/cghub point list | set <id> <case> [icône] | del <id> | tp <id>",
                 "/cghub livre [joueur]",
                 "/cghub reload")) {
-            s.sendMessage(fr.cleangang.hub.util.Text.mm(" <gray>" + l));
+            s.sendMessage(Text.mm(" <gray>" + l));
         }
     }
 

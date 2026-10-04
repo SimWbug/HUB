@@ -1,16 +1,28 @@
-# CleanGangHub
+# CleanGangHub 1.1.0 — Paper 26.3
 
-Plugin Paper : multimonde pour les maps de mini-jeux, carte du monde ouverte depuis un livre
+Multimonde pour les maps de mini-jeux, carte du monde ouverte depuis un livre
 (avec nuages qui se dissipent), points de TP posés sur la carte et menu des mini-jeux.
 
 ## Build
-    mvn package      ->  target/CleanGangHub-1.0.0.jar  (à mettre dans plugins/)
-Adapte `paper.version` dans pom.xml à la version de ton serveur.
+Prérequis : **JDK 25** (obligatoire pour Paper 26.x) et Maven.
+
+    mvn package      ->  target/CleanGangHub-1.1.0.jar  (à mettre dans plugins/)
+
+La dépendance `[26.3.build,)` récupère automatiquement le dernier build de paper-api 26.3.
+
+## Mondes sur Paper 26.x
+Les mondes ne sont plus à la racine du serveur mais dans
+`world/dimensions/<namespace>/<clé>/`. Le plugin utilise la clé `cleangang:<id>`.
+
+- Nouveau monde vide : `/cghub world create poulet void`
+  -> world/dimensions/cleangang/poulet/
+- Importer une map existante (dossier avec level.dat) : copie-la à la racine du
+  serveur sous le nom de l'id (ex. `blockhunt/`), puis `/cghub world load blockhunt void`.
+  Paper la convertit, et le plugin note sa clé dans config.yml (`key:`).
+  Fais une sauvegarde avant : la conversion est irréversible.
 
 ## Démarrage rapide
-1. Copie le dossier de chaque map (poulet, blockhunt, flip7...) à côté de `world`.
-2. Démarre le serveur : les mondes listés dans config.yml sont chargés automatiquement.
-   (ou `/cghub world load <nom> void`, ou `/cghub world create <nom> void` pour un monde vide)
-3. Va à l'endroit voulu et pose un point : `/cghub point set spawn 22 BEACON`
-4. Change le nom / la description dans points.yml puis `/cghub reload`.
-5. Clic droit avec le livre (ou `/carte`) -> la carte s'ouvre derrière les nuages.
+1. Démarre le serveur, crée/importe tes mondes (voir ci-dessus).
+2. Va à l'endroit voulu et pose un point : `/cghub point set spawn 22 BEACON`
+3. Change le nom / la description dans points.yml puis `/cghub reload`.
+4. Clic droit avec le livre (ou `/carte`) -> la carte s'ouvre derrière les nuages.

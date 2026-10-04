@@ -7,6 +7,7 @@ import fr.cleangang.hub.util.Text;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -68,12 +69,13 @@ public final class MapMenu {
         // 2) les points de téléportation
         for (WarpPoint pt : plugin.points().all()) {
             if (pt.slot() < 0 || pt.slot() >= size) continue;
-            boolean ok = pt.available();
+            World w = pt.resolveWorld();
+            boolean ok = w != null;
             List<String> lore = new ArrayList<>(pt.lore());
             lore.add("");
             if (ok) {
-                int n = Bukkit.getWorld(pt.world()).getPlayers().size();
-                lore.add("<dark_gray>Monde : <gray>" + pt.world() + " <dark_gray>• <gray>" + n + " joueur(s)");
+                int n = w.getPlayers().size();
+                lore.add("<dark_gray>Monde : <gray>" + plugin.worlds().label(w) + " <dark_gray>• <gray>" + n + " joueur(s)");
                 lore.add("<green>▶ Clic pour t'y rendre");
             } else {
                 lore.add("<red>✖ Monde non chargé");

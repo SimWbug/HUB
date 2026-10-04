@@ -18,13 +18,13 @@ public final class Items {
 
     /** Case décorative sans texte (fond de carte, nuages...). */
     public static ItemStack filler(Material m) {
-        ItemStack it = new ItemStack(m);
+        ItemStack it = ItemStack.of(m);
         it.editMeta(meta -> meta.displayName(Component.text(" ")));
         return it;
     }
 
     public static ItemStack icon(Material m, String name, List<String> lore, boolean glow) {
-        ItemStack it = new ItemStack(m);
+        ItemStack it = ItemStack.of(m);
         it.editMeta(meta -> {
             meta.displayName(Text.mm(name));
             meta.lore(Text.mm(lore));

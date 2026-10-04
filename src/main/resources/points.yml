@@ -11,7 +11,7 @@
 #     slot: 22
 #     lore:
 #       - "<gray>Le cœur de CleanGang"
-#     world: world
+#     world: "minecraft:overworld"   # clé du monde (posée automatiquement par /cghub point set)
 #     x: 0.5
 #     y: 70.0
 #     z: 0.5

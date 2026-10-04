@@ -6,14 +6,25 @@
 prefix: "<dark_gray>[<gradient:#7ee8fa:#eec0c6>CleanGang</gradient><dark_gray>] "
 
 # Monde "hub" : là où on renvoie les joueurs quand un monde est déchargé
-hub-world: world
+# (id d'un monde ci-dessous, ou clé complète comme minecraft:overworld)
+hub-world: "minecraft:overworld"
 
 # ------------------------------------------------------------
-#  MONDES (cartes de mode de jeu)
-#  Copie le dossier de ta map dans le dossier du serveur
-#  (à côté de "world"), puis déclare-le ici ou fais /cghub world load <nom>
+#  MONDES (cartes de mode de jeu) — Paper 26.x
+#  Depuis 26.1, chaque monde est rangé dans :
+#     world/dimensions/<namespace>/<clé>/
+#  Ici, l'id "poulet" devient la clé cleangang:poulet
+#     -> world/dimensions/cleangang/poulet/
+#
+#  Importer une ancienne map (dossier avec level.dat, ex. téléchargée
+#  ou d'avant 26.1) : pose le dossier à la racine du serveur avec le
+#  même nom que l'id, puis /cghub world load <id>. Paper la convertit
+#  au nouveau format et le plugin note sa clé ("key:") automatiquement.
+#
 #  type : void | normal | flat | nether | end
 #  gamemode : ADVENTURE | SURVIVAL | CREATIVE | SPECTATOR (optionnel)
+#  pvp : true/false (géré par le plugin)
+#  key : (optionnel) clé du monde si différente de cleangang:<id>
 # ------------------------------------------------------------
 worlds:
   poulet:

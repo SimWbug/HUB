@@ -61,7 +61,7 @@ public final class GamesMenu {
                 int slot = g.getInt("slot", -1);
                 if (slot < 0 || slot >= size) continue;
 
-                World w = Bukkit.getWorld(g.getString("world", id));
+                World w = plugin.worlds().resolve(g.getString("world", id));
                 int players = w == null ? 0 : w.getPlayers().size();
                 boolean open = destination(id) != null;
 
@@ -93,7 +93,7 @@ public final class GamesMenu {
         if (g == null) return null;
         WarpPoint pt = plugin.points().get(g.getString("point"));
         if (pt != null) return pt.location();
-        World w = Bukkit.getWorld(g.getString("world", id));
+        World w = plugin.worlds().resolve(g.getString("world", id));
         return w == null ? null : w.getSpawnLocation().add(0.5, 0, 0.5);
     }
 

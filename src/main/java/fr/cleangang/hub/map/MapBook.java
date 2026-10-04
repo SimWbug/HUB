@@ -20,7 +20,7 @@ public final class MapBook {
     }
 
     public ItemStack create() {
-        ItemStack it = new ItemStack(Material.BOOK);
+        ItemStack it = ItemStack.of(Material.BOOK);
         it.editMeta(meta -> {
             meta.displayName(Text.mm(plugin.getConfig().getString("book.name", "Carte du monde")));
             meta.lore(Text.mm(plugin.getConfig().getStringList("book.lore")));
