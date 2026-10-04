@@ -1,0 +1,40 @@
+name: Build CleanGangHub
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ 'v*' ]          # ex: git tag v1.1.0 -> crée aussi une release GitHub
+  pull_request:
+  workflow_dispatch:         # bouton "Run workflow" dans l'onglet Actions
+
+permissions:
+  contents: write            # nécessaire pour publier la release sur un tag
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupérer le code
+        uses: actions/checkout@v4
+
+      - name: Installer Java 25
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: maven
+
+      - name: Compiler le plugin
+        run: mvn -B -U package
+
+      - name: Envoyer le .jar (artefact)
+        uses: actions/upload-artifact@v4
+        with:
+          name: CleanGangHub
+          path: target/CleanGangHub-*.jar
+
+      - name: Créer la release (sur tag v*)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: target/CleanGangHub-*.jar
