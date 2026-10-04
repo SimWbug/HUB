@@ -1,0 +1,25 @@
+name: CleanGangHub
+version: 1.0.0
+main: fr.cleangang.hub.CleanGangHub
+api-version: '1.21'
+author: Simon
+description: Multimonde, carte du monde (livre + nuages) et menu des mini-jeux pour CleanGang
+
+commands:
+  carte:
+    description: Ouvre la carte du monde
+    aliases: [map]
+  jeux:
+    description: Ouvre le menu des mini-jeux
+    aliases: [games, minijeux]
+  cghub:
+    description: Administration de CleanGangHub
+    permission: cghub.admin
+
+permissions:
+  cghub.admin:
+    description: Accès aux commandes /cghub
+    default: op
+  cghub.bypass:
+    description: Ignore le mode de jeu forcé par monde
+    default: op
