@@ -1,0 +1,46 @@
+name: CleanGangHub
+version: 2.0.0
+main: fr.cleangang.hub.CleanGangHub
+api-version: '26.3'
+load: POSTWORLD
+author: Simon
+description: Multimonde complet (style MultiWorld) + carte du monde (livre + nuages) + menu des mini-jeux, pour Paper 26.3
+
+commands:
+  world:
+    description: Gestion des mondes
+    aliases: [mw, multiworld, monde]
+  carte:
+    description: Ouvre la carte du monde
+    aliases: [map]
+  jeux:
+    description: Ouvre le menu des mini-jeux
+    aliases: [games, minijeux]
+  cghub:
+    description: Carte, points et livre
+    permission: cghub.admin
+
+permissions:
+  cghub.admin:
+    description: Tout CleanGangHub
+    default: op
+    children:
+      cghub.world: true
+      cghub.world.back: true
+      cghub.bypass: true
+  cghub.world:
+    description: Toutes les commandes /world (sauf back)
+    default: op
+  cghub.world.back:
+    description: /world back
+    default: true
+  cghub.bypass:
+    description: Ignore mode de jeu forcé et whitelists de monde
+    default: op
+    children:
+      cghub.bypass.gamemode: true
+      cghub.bypass.whitelist: true
+  cghub.bypass.gamemode:
+    default: op
+  cghub.bypass.whitelist:
+    default: op
